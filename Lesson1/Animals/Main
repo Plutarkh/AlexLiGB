@@ -1,0 +1,20 @@
+public class main {
+    public static void main(String[] args) {
+
+        Cat a = new Cat("Asya", "Grey", 2);
+        Dog d = new Dog("Sharik", "Black", 3);
+
+        d.getInfo();
+        d.run(750);
+        d.swim(35);
+        d.jump(4);
+        d.voice();
+        System.out.println();
+
+        a.getInfo();
+        a.run(750);
+        a.swim(35);
+        a.jump(4);
+        a.voice();
+    }
+}
