@@ -1,0 +1,27 @@
+
+    //Создаем класс полосы припятствий (Бег, плавание, прыжки)
+public class Course {
+
+    int running;
+    int swiming;
+    int jumping;
+
+
+    //Конструктор
+    public Course(int running, int swiming, int jumping){
+        this.running = running;
+        this.swiming = swiming;
+        this.jumping = jumping;
+    }
+    // Инфо о полоске припятствий
+    public void getCourseInfo(){
+        System.out.println("Кросс " + running + " метра" + " \n" + "Плавание " + swiming + " метра"  + "\n" +
+                "Прыжки в высоту " + jumping + " метра" + " \n");
+    }
+
+
+
+
+
+
+
