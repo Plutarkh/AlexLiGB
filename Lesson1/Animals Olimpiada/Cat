@@ -1,0 +1,62 @@
+public class Cat extends Animal {
+
+    //Определяем границы физических способностей
+    private int canRun = main.getRnd(1000, 2500);
+    private  int canSwim = main.getRnd(3,12);
+    private  double canJump = 4.5;
+
+
+    //Проходим конкретные припятствия
+    @Override
+    public boolean run(int dist){
+        if (canRun>=dist){
+            System.out.println("Кошка " + name +  " пробежала " + dist + " " + "метров");
+            return true;
+        }
+        else System.out.println("Кошка " + name +  " не приодолела припятствия");
+        return false;
+    }
+
+    @Override
+    public boolean swim(int dist){
+        if (canSwim>=dist){
+            System.out.println("Кошка " + name +  " проплыла " + dist + " " + "метров");
+            return true;
+        }
+        else System.out.println("Кошка " + name +  " не приодолела припятствия");
+        return false;
+    }
+
+    @Override
+    public boolean jump(double dist){
+        if (canJump>=dist){
+            System.out.println("Кошка " + name +  " прыгнула на  " + dist + " " + "метров");
+            return true;
+        }
+        else System.out.println("Кошка " + name +  " не приодолела припятствия");
+        return false;
+    }
+
+
+
+
+    //Подаем уникальный голос
+    @Override
+    public void voice(){
+        System.out.println("Кошка " + name +  " сказала mewooo!");
+    }
+
+    //Даем расширенное инфо
+    @Override
+    public void getInfo(){
+        System.out.println("Name "+ name +" "+ "Color " + color + " "+  "Age " + age);
+        System.out.println("Может пробежать " + canRun + " Может проплыть " + canSwim  + " Может прыгнуть на " + canJump);
+        System.out.println();
+    }
+
+    //Констурктор
+    public Cat (String name, String color, int age){
+        super(name, color, age);
+    }
+
+}
