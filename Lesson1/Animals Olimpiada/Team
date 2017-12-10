@@ -1,0 +1,33 @@
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
+
+public class Team {
+
+    // Название команды
+    String teamName;
+
+    //Массив членов команды
+    Animal[] team = {new Cat("Barsik", "Black", 3), new Cat("Filya", "Ginger", 2),
+            new Dog("Sharik", "Green", 5), new Dog("Snegok", "White", 4)};
+
+    //Конструктор
+    public Team(String teamName) {
+        this.teamName = teamName;
+    }
+
+    //Информация о команде
+    public void teamInfo() {
+        System.out.println("\n" + "Команда " + teamName + "\n");
+        for (int i = 0; i < team.length; i++) {
+            team[i].getInfo();
+        }
+    }
+
+    //Чествуем победитедей
+    public void whoIsWinner() {
+        for (int i = 0; i <team.length ; i++) {
+            if (team[i].Winner==true) System.out.println("Поздравляем " + team[i].name+ "а! Гип-Гип, У HF!");
+        }
+        }
+    }
+
