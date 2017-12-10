@@ -1,0 +1,48 @@
+import java.util.Random;
+
+public class main {
+
+    //Создаем общий рандомайзер для использования во всех элиментах кода
+    public static int getRnd(int a, int b){
+        int num = 0;
+        for (;;) {
+            Random rnd = new Random();
+            int i = rnd.nextInt(b);
+
+            if (i>=a && i<=b) {
+                num = i;
+                break;
+            }
+        }
+        return num;
+    }
+
+
+    public static void main(String[] args) {
+
+
+
+        //Создаем полосу припятствий
+        Course obstacles = new Course( (getRnd(1000, 5000)),getRnd(10, 50), 2 );
+
+        //Создаем команду
+        Team team = new Team("Viskas Forever");
+
+        // Знакомимся с командой
+        team.teamInfo();
+
+        //Знакомимся с полосой припятствий
+        obstacles.getCourseInfo();
+
+        //Проходим полосу припятствий
+        for (int i = 0; i <team.team.length ; i++) {
+            if ((team.team[i].passObstacle(obstacles.running,obstacles.swiming,obstacles.jumping))==true)
+                team.team[i].Winner=true ;
+            System.out.println();
+        }
+
+        //Чествуем победителей!
+        team.whoIsWinner();
+
+    }
+}
