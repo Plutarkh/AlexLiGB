@@ -1,0 +1,19 @@
+
+//Собственый класс ошибки данных
+
+public class MyArrayDataException extends NumberFormatException {
+
+    String note;
+    int i;
+    int j;
+    public MyArrayDataException(String note){
+        this.note = note;
+
+    }
+
+    @Override
+    public String toString(){
+        return "MyArrayDataException " + note;
+    }
+
+}
