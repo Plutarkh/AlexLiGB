@@ -1,0 +1,15 @@
+
+//Собственый класс ошибки - нверный размер массива
+
+public class MyArraySizeException extends RuntimeException {
+
+    String note;
+
+    public MyArraySizeException(String note) {
+        this.note = note;
+    }
+    @Override
+    public String toString(){
+        return "MyArraySizeException :" + note;
+    }
+}
