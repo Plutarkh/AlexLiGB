@@ -1,0 +1,57 @@
+public class Array {
+
+    static int SIZE = 16;
+
+ //Создаем метод, генерирующий многомерный массив
+    String[][] array;
+
+    public Array (String [][] array){
+        this.array = array;
+
+    }
+
+// Метод проверки размера массива
+
+    public void CheckArrayLangth(String[][] array){
+        int langth = 0;
+        for (int i = 0; i <array.length ; i++) {
+            langth +=array[i].length;
+        }
+        System.out.println(langth);
+        if (langth!=SIZE) throw new MyArraySizeException("Размера массива не верен");
+    }
+
+
+    // Метод, выводящий содержжание массива
+
+    public void printArray (String[][]array){
+        for (int i = 0; i <array.length; i++) {
+            for (int j = 0; j <array[0].length ; j++) {
+                System.out.print(array[i][j] + " ");
+            }
+        }
+
+    }
+
+
+     // Преобразуем содержимое массива в int и суммирующий значения
+
+    public void stringToInt()  {
+        int summ=0;
+        for (int i = 0; i <array.length ; i++)  {
+            for (int j = 0; j <array[i].length ; j++) {
+                Integer a = null;
+                try {
+                    a = Integer.parseInt(array[i][j]);
+                } catch (NumberFormatException e) {
+                    throw new MyArrayDataException("Ошибка содержимого массива в ячейке: " + "[" + i + "] " + "[" + j + "]");
+                }
+                summ+=a;
+            }
+        }
+        System.out.println("\nСумма элиментов массива составляет " + summ);
+    }
+
+}
+
+
