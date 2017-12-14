@@ -1,0 +1,36 @@
+import java.util.Scanner;
+
+public class mian {
+
+
+    public static void main(String[] args) {
+
+        //Создаем объкт, генерирующий многомерный массив
+        Array stringer = stringer = new Array(new String[4][4]);
+
+        //Заполняем многомерный массив
+        System.out.println(  "\nЗаполните массив! \n"  );
+        Scanner scr = new Scanner(System.in);
+        for (int i = 0; i < stringer.array.length; i++) {
+            for (int j = 0; j < stringer.array[0].length; j++) {
+                stringer.array[i][j] = scr.nextLine();
+            }
+        }
+
+        //Вызываем метод проверки массива
+        try {
+        stringer.CheckArrayLangth(stringer.array);
+        } catch (MyArraySizeException e) {
+        e.printStackTrace();
+        }
+
+        //Вызываем метод преобразований
+
+        try {
+            stringer.stringToInt();
+        } catch (MyArrayDataException e) {
+        e.printStackTrace();
+        }
+    }
+}
+
