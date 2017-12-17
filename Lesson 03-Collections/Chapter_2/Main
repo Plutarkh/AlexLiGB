@@ -1,0 +1,21 @@
+import java.util.Collection;
+import java.util.LinkedList;
+
+public class Main {
+
+    public static void main(String[] args) {
+        PhoneBook book = new PhoneBook();
+        book.add("Doe", 7557755);
+        book.add("Phillips", 92384750);
+        book.add("Doe", 2483157);
+        book.add("Konnars", 98132740);
+        book.add("Presley", 320194);
+        book.add( "Presley", 238704);
+
+
+        book.get("Presley");
+        book.get("Doe");
+        book.get("Phillips");
+
+    }
+}
