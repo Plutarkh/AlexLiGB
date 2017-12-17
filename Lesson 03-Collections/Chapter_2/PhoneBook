@@ -1,0 +1,24 @@
+import java.util.HashMap;
+import java.util.LinkedList;
+
+
+public class PhoneBook {
+
+    public static HashMap<String, LinkedList> phonebook = new HashMap<>();
+
+
+    public  void add(String name, Integer phone){
+        if (!phonebook.containsKey(name)) {
+            LinkedList<Integer> phonelist = new LinkedList<Integer>();
+            phonelist.add(phone);
+            phonebook.put(name, phonelist);
+        }
+        else phonebook.get(name).add(phone);
+     }
+
+
+     public  void get(String name){
+         System.out.println(phonebook.get(name));
+     }
+
+}
