@@ -1,0 +1,57 @@
+package sample;
+
+//Импортим JavaFX
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import java.awt.*;
+
+
+
+//Расширяем метод Main от Application
+public class Main extends Application {
+
+    // Стандартный main
+    public static void main(String[] args) {
+
+        // Запускаем приложение через ланчер
+        launch(args);
+    }
+
+    //При необходимости Переопределяем метод INIT
+    //public void init(){
+    //}
+
+
+    //Переопредеояем метод START
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+
+        //Загрузка FXML панели
+        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+
+
+        //Устанавливаем заголовок окна
+        primaryStage.setTitle("Let's talk!");
+
+
+        // Устанавливаем пераметры окна
+        primaryStage.setScene(new Scene(root, 350, 400));
+        primaryStage.setResizable(false);
+
+        // Нарисовать экран
+        primaryStage.show();
+
+
+    }
+
+    //При необходимсти Переопределяем метод STOP
+    //public  void stop(){
+    //}
+
+
+
+}
