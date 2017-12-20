@@ -1,0 +1,27 @@
+package sample;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
+public class Controller {
+
+    @FXML
+    public TextArea ta;
+    @FXML
+    public TextField tf;
+
+    public void sendMessage(){
+        String Message = tf.getText();
+        tf.clear();
+        ta.appendText(" - " + Message + "\n" + timeFormat.format(timeNow) + "\n\n");
+    }
+
+    // Выводим время сообщения
+    Date timeNow = new Date();
+    SimpleDateFormat timeFormat = new SimpleDateFormat("    k:mm ");
+
+}
