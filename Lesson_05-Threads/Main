@@ -1,0 +1,14 @@
+public class Main {
+    static final int size = 10000000;
+
+
+    public static void main(String[] args) {
+
+        Method_1 a = new Method_1();
+        a.mass(size);
+
+        Method_2 b = new Method_2();
+        b.mass(size);
+
+    }
+}
