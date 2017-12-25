@@ -27,8 +27,11 @@ public class Method_2 {
         Thread thread1 = new Thread(new Runnable(){
             @Override
             public void run(){
+
+
                 for (int i = 0; i <mass2.length ; i++) {
-                    mass2[i] = (float)(mass2[i]*Math.sin(0.2f+i/5)*Math.cos(0.4f + i/2));
+                    mass2[i] = (float)(mass2[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
+
                 }
             }
         });
@@ -37,17 +40,18 @@ public class Method_2 {
         Thread thread2 = new Thread(new Runnable(){
             @Override
             public void run(){
-                for (int i = 0; i <mass3.length ; i++) {
-                    mass3[i] = (float)(mass3[i]*Math.sin(0.2f+i/5)*Math.cos(0.4f + i/2));
+
+                for (int i = 5000000; i <mass3.length ; i++) {
+                    mass3[i] = (float)(mass3[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
                 }
+                System.out.println("Посчитал");
             }
         });
 
         //Стартуем потоки
         thread1.start();
         thread2.start();
-        thread1.run();
-        thread2.run();
+
 
         //Склеиваем Массивы
         System.arraycopy(mass2, 0, mass, 0,mass2.length);
