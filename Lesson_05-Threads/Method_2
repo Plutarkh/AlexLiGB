@@ -52,6 +52,15 @@ public class Method_2 {
         thread1.start();
         thread2.start();
 
+        //Дожидаемся завершеня выполнения потоков
+        try {
+            thread1.join();
+            thread2.join();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         //Склеиваем Массивы
         System.arraycopy(mass2, 0, mass, 0,mass2.length);
