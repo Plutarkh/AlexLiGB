@@ -1,0 +1,98 @@
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
+
+
+public class Server_Main {
+
+    public static void main(String[] args){
+
+        //Создаем ссылку типа ServerSocket
+        ServerSocket serverSocket = null;
+
+        //Создаем ссылку типа Socket
+        Socket socket = null;
+
+        //Оборачиваем в try - catch   поскольку соединения могут генерить эксепшены
+        try{
+
+            //Создаем объект класса serverSocket и цепляем его к созданной ссылке, слущающий порт 8189
+            serverSocket = new ServerSocket(8189);
+            System.out.println("Сервер запущен, ждем клиентов");
+
+            //Создаем объект класса Socket и цепляем его к созданной ссылке
+            socket = serverSocket.accept(); //сервер ждет подключений
+            System.out.println("Клиент подключился");
+
+            //Создаем сканер для получения потока данных из Сокета (Обработчик входящего потока данных)
+            Scanner scanner = new Scanner(socket.getInputStream());
+
+            //Создаем объект класса printWriter (Обработчик исходящего потока данных)
+            PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+
+
+            //Собственно, мое творчество
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+            //Создаем новый поток
+            Thread thread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    //Создаем сканер на ввод текста в консоль
+                    Scanner consol = new Scanner(System.in);
+                    while (true){
+
+                        //Присваеваем строковой переменной содержание сообщения от сервера
+                        String serverMessage = consol.nextLine();
+
+                        //Распечатываем исходящее сообщение от сервера в консоль
+                        //System.out.println("Сервер: " + serverMessage + "\n");
+
+                        //Отправялем содержимое в исходящем потоке обратно клиенту
+                        printWriter.println("Сервер: " + serverMessage); //складывается в буфер
+                        printWriter.flush(); //вытащить из буфера и отправить
+
+                    }
+                }
+            });
+            thread.start();
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            //Создаем бесконечный цикл
+            while(true){
+
+                //Присваиваем переменной str строковые данные,  полученные по входящему потоку от обаботчика Scanner
+                String str = scanner.nextLine();
+
+                //Распечатываем входящий поток в консоль
+                System.out.println("Клиент: " + str);
+
+                //Отправялем содержимое в исходящем потоке обратно клиенту
+                printWriter.println("Клиент: " + str); //складывается в буфер
+                printWriter.flush(); //вытащить из буфера и отправить
+
+
+            }
+
+
+
+            //Обработчик ошибок
+        }catch(IOException e){
+            System.out.println("Ошибка инициализации");
+
+            //Прописываем финализатор на случая ошибок - обязательно закрываем сокет.
+        }finally{
+            try{
+                serverSocket.close();
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+}
