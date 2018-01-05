@@ -1,0 +1,154 @@
+package Client;
+
+import Serve.ServerConst;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.Scanner;
+
+
+public class ChatWindow extends JFrame implements ServerConst {
+
+    //Создаем ссылку на логику соединения;
+    private ClientConnection client;
+
+    //Создаем ссылку поля для ввода текста
+    private JTextField jTextField;
+
+    //Создаем ссылку  окна переписки
+    private JTextArea jTextArea;
+
+    //Финализируем номер порта
+    private final int SERVER_PORT = 8189;
+
+    private final String SERVER_ADDRESS = "localhost";
+
+    //Создаем ссылку на сокет
+    private Socket socket;
+
+    //Создаем ссылку обработчика входищего потока
+    private Scanner in;
+
+    //Создаем ссылку обработчика исходящего потока
+    private PrintWriter out;
+
+    //Кастомизируем конструктор
+    public ChatWindow(){
+
+        //Создае экземпляр Клинт коннекшен для запуска логики соединения
+
+        client = new ClientConnection();
+        client.init(this);
+
+        //Делаем разметку пользовательского интерфейса клиента
+
+        //Заголовок
+        setTitle("Chat");
+        //Определяем размер окна
+        setSize(400,400);
+        //Позиционируем по центру экрана
+        setLocationRelativeTo(null);
+        //Прописываем ействие закрытия программы
+        setDefaultCloseOperation((WindowConstants.EXIT_ON_CLOSE));
+
+        //Создаем окно переписки
+        jTextArea = new JTextArea();
+        //Запрещаем редактировать окно переписки
+        jTextArea.setEditable(false);
+        //Активируем метод переноса текста в окне переписки
+        jTextArea.setLineWrap(true);
+
+        //Создаем прокрутку, и привязываем ее к окну переписки
+        JScrollPane jScrollPane = new JScrollPane(jTextArea);
+
+        //Создаем контейнер панели (фон)
+        JPanel jPanel = new JPanel();
+        jPanel.setLayout(new BorderLayout());
+        //Определяем размеры контейнера
+        jPanel.setPreferredSize(new Dimension(200,50));
+
+        //Созадем кнопочку
+        JButton send = new JButton("Send");
+
+        //Создаем полле ввода текста
+        jTextField = new JTextField();
+        //Определяем размер поля ввода текста
+        jTextField.setPreferredSize(new Dimension(200, 50));
+
+        //Привязываем к кнопке Send слушателя
+        send.addActionListener(new ActionListener() {
+
+            //реализуем метод actionPerformed
+            @Override
+            public void actionPerformed(ActionEvent e){
+                sendMessage();
+            }
+        });
+
+        //Привязываем к полю ввода текста слушателя
+        jTextField.addActionListener(new ActionListener() {
+            //реализуем метод actionPerformed
+            @Override
+            public void actionPerformed(ActionEvent e){
+                sendMessage();
+            }
+        });
+
+        //Добавляем в контейнер кнопку send справа
+        jPanel.add(send, BorderLayout.EAST);
+        //Доавляем в контейнер поле ввода текста
+        jPanel.add(jTextField, BorderLayout.CENTER);
+        //Доавляем в контейнер полосу прокрутки
+        add(jScrollPane, BorderLayout.CENTER);
+        //Добавляем контейнер вниз
+        add(jPanel, BorderLayout.SOUTH);
+        //Делаем интерфейс видимым
+        setVisible(true);
+
+        //Созадем поток
+        new Thread(new Runnable() {
+            //Прописываем алгоритм, который будет выполняться в потоке
+            @Override
+            public void run(){
+                //Запускае бесконечный цикл работы потока
+                while(true){
+                    //В рамках цикла опрашиваем входящий поток на наличие входящего сособщения
+                    if(in.hasNext()){
+                        //Если сообщение есть - вносим его в переменную string
+                        String string = in.nextLine();
+
+                    }
+                }
+            }
+            //Статуем поток
+        }).start();
+
+    }
+    //Определяем метод отправки сообщения
+    public void sendMessage(){
+
+        //Забираем текст из текстового поля и переносим в msg
+        String msg = jTextField.getText();
+
+
+        //эмммм, посмотреть, как это работает
+        jTextField.setText("");
+        client.sengMessage(msg);
+    }
+
+    //Метод передчи сообщения от сервера в текстовое поле
+    public void showMessage(String msg){
+        jTextArea.append(msg + "\n");
+
+        //Система для скроллинга всех сообщений у всех клиентов
+        jTextArea.setCaretPosition(jTextArea.getDocument().getLength());
+
+    }
+
+}
+
