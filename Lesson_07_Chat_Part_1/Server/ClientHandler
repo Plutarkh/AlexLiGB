@@ -1,0 +1,70 @@
+package Server;
+
+import java.io.*;
+import java.net.Socket;
+
+//Класс отвечает за приконекченныз пользователей
+public class ClientHandler {
+
+    //Ссылка на сервер
+    private Server server;
+    //Сокет для общения с сервером
+    private Socket socket;
+
+    //Ссылки Каналов связи исходящий / входящий
+
+    private DataInputStream in;
+    private DataOutputStream out;
+
+    //Создаем конструктор для КлиентХенлера с сервером и сокетом
+
+    public ClientHandler(Server server, Socket socket){
+
+        // Оборачиваем в трайкетч
+
+        try {
+            this.server = server;
+            this.socket = socket;
+
+            //Создаем в констуктора каналы связи
+
+            in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream (socket.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Создаем новый поток для приема входящих сообщений
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    while (true){
+
+                        //Сервер принял входящее сообщение
+                        String msg = in.readUTF();
+                        System.out.println("Клиент отправил сообщение: " + msg);
+
+                        //Отправляем это сообщение всем спользуя метод Броадкаст, из класса Server
+                        server.broadcast(msg);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        thread.start();
+    }
+
+    //Создаем метод отправки сообщений
+    public void sendMessage(String msg){
+        try {
+            out.writeUTF(msg);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
