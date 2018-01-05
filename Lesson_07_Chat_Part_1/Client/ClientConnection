@@ -1,0 +1,63 @@
+package Client;
+
+import Serve.ServerConst;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+
+public class ClientConnection implements ServerConst {
+
+    //Создаем сокет для коннекта
+    Socket socket;
+
+    //Создаем ссылки на входящие и исходящие каналы
+    DataInputStream in;
+    DataOutputStream out;
+
+
+
+    //Метод, передающий сообщение в текстовое поле
+    public void init(ChatWindow view){
+
+        try{
+            //Создаем в констуркторе  сокет для коннекта и каналы связи
+            this.socket = new Socket(SERVER_URL, PORT);
+            this.in = new DataInputStream(socket.getInputStream());
+            this.out = new DataOutputStream(socket.getOutputStream());
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        while (true) {
+                            String msg = in.readUTF();
+                            view.showMessage(msg);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    //Метод отправки сообщения
+    public void sengMessage(String msg){
+        //Забираем сообщение  (msg)  из Чатвиндоу из метода send Message и отправляем
+        try {
+            out.writeUTF(msg);
+            // Отчищаем буфер
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
