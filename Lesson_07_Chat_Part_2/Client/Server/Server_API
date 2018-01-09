@@ -1,9 +1,0 @@
-package Server;
-
-//Интерфейс серверных системных сообений
-public interface Server_API {
-
-    String CLOSE_CONNECTION = "/end";
-    String AUTH = "/auth";
-    String AUTH_SUCCESSFUL = "/authok";
-}
