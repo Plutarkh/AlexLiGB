@@ -1,0 +1,63 @@
+package Server;
+
+//Сущность, которая имплиментит интерфейс сервиса авторизации
+
+import javax.swing.text.html.parser.Entity;
+import java.util.ArrayList;
+
+public class BaseAuthService implements AuthService   {
+
+    //Создаем внутренник класс Entry (типа база данных для пользователей)
+    private class Entry{
+        private String login;
+        private String password;
+        private String nick;
+
+        public Entry (String login , String password, String nick){
+            this.login = login;
+            this.password = password;
+            this.nick = nick;
+        }
+
+    }
+
+    //Создаем массив клиентов, которые у нас сущетсуют
+    ArrayList<Entry> entries;
+
+    //Создаем констурктор для класса BaseAuthService  и в нем создаем коллекцию для клиентов
+
+    public BaseAuthService(){
+        this.entries = new ArrayList<>();
+        //Добавляем несколько новых пользователей
+        entries.add(new Entry("Login1", "password1", "nick1"));
+        entries.add(new Entry("Login2", "password2", "nick2"));
+        entries.add(new Entry("Login3", "password3", "nick3"));
+    }
+
+    @Override
+    public void start(){
+
+    }
+
+    @Override
+    public void stop(){
+
+    }
+
+    //Метод получает от пользователя логин и пароль. Если такие есть в базе entries, возвращает НикНейм
+    @Override
+    public String getNickByLoginPass(String login, String pass){
+        for (int i = 0; i <entries.size() ; i++) {
+            if(entries.get(i).login.equalsIgnoreCase(login) && entries.get(i).password.equals(pass))
+                return entries.get(i).nick;
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+}
