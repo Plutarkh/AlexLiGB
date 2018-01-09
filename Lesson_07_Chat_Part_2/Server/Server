@@ -1,0 +1,89 @@
+package Server;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Vector;
+
+public class Server implements ServerConst {
+
+    //Создаем коллекция для хранения клиентов
+    //Vector -  полностью синхронизированный ArrayList
+
+    private Vector<ClientHandler> clients;
+
+    //Создаем сылку на сервис авторизации и геттер на него
+    private AuthService authService;
+    public AuthService getAuthService() {
+        return authService;
+    }
+
+
+    //Создаем конструктор сервера
+    public Server(){
+
+
+
+        ServerSocket server = null;
+        Socket socket = null;
+        clients = new Vector<>();
+
+
+        // Создаем цикл для постоянного доступа сервера для новых клиентов
+        //Оборачиваем все в трайкетч
+
+        try {
+            server = new ServerSocket(PORT);
+
+            //Создаем сервис авторизации и запускаем его
+            authService = new BaseAuthService();
+            authService.start();
+
+            System.out.println("Сервер запущен, ожидаем подключения клиентов");
+
+            while (true){
+                socket = server.accept();
+                clients.add(new ClientHandler(this,socket));
+                System.out.println("Клиент подключен");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////
+    //Создаем метод для отправки ЛС
+    public void sendPrivateMessage(String name, String pMsg, String toNick){
+        for (int j = 0; j < clients.size(); j++) {
+
+            if (toNick.contains(clients.get(j).getNick())) clients.get(j).sendMessage("ЛС от "+ name + ": " + pMsg);
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////
+
+    //Создаем метод для отправки сообщений всем
+    public void broadcast(String msg){
+
+        //Проходимся по всем клиентам из списка и отправляем им сообщения
+
+        for (int i = 0; i <clients.size() ; i++) {
+            clients.get(i).sendMessage(msg);
+
+
+        }
+
+    }
+    //Создаем метод отключения от чата
+    public void unSubscribeMe(ClientHandler c){
+    clients.remove(c);
+    }
+
+    //Проверяем Ник на задвоение при авторизации
+    public boolean isNickBusy(String nick){
+        for(ClientHandler client: clients){
+            if (client.getNick().equals(nick)) return true;
+        }
+        return false;
+    }
+}
