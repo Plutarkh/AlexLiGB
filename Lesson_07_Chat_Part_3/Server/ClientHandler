@@ -1,0 +1,157 @@
+package Server;
+
+import java.io.*;
+import java.net.Socket;
+import java.util.Map;
+
+//Класс отвечает за приконекченныз пользователей
+public class ClientHandler implements Server_API {
+
+    //Ссылка на сервер
+    private Server server;
+    //Сокет для общения с сервером
+    private Socket socket;
+
+    //Создаем ссылку для Ника
+     private String nick;
+
+    //Ссылки Каналов связи исходящий / входящий
+    private DataInputStream in;
+    private DataOutputStream out;
+
+    //Создаем конструктор для КлиентХенлера с сервером и сокетом
+
+    public ClientHandler(Server server, Socket socket){
+
+        // Оборачиваем в трайкетч
+
+        try {
+            this.server = server;
+            this.socket = socket;
+
+
+
+            //Создаем в констуктора каналы связи
+
+            in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream (socket.getOutputStream());
+            nick = "undefined";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //Используем лямбда выражение, сворачиваем анонимный класс в ананимную функцию.
+        //Мы НЕ создаем экземпляр анонимнго класса. Прросто апускаем метод
+        //Вызываем метод без создания объекта
+        new Thread(() -> {
+                try {
+                    //Создаем цикл авторизации
+                    while (true) {
+                        String msg = in.readUTF();
+                        //Проверяем, начинается ли строка с ключа  /auth
+                        if (msg.startsWith(AUTH)) {
+                            //Если начинается, то делим строчку по пробелу с помощью метода split();
+                            String[] element = new String[3];
+                            element = msg.split(" ");
+                            //В результате получаем Стринговый массив  elements, в котором первая ячйка - ключ,
+                            //Второя ячейка - логин, третья ячейка - пароль
+
+                            //Поучаем Ник обращаясь к серверу, через метод getAuthService(), переходим к BaseAuthService,
+                            //А там вызываем метод getNickByLoginPass
+                            String nick = server.getAuthService().getNickByLoginPass(element[1], element[2]);
+
+                            //Проверяем, прошал ли авторизация
+                            if (nick != null) { //т.е. если в результате аторизации получили ник
+
+                                //Проверяем, не авторизовался ли такой Ник уже
+                                if (!server.isNickBusy(nick)) {
+
+                                    //Если такой логин и пароль есть, и если ник еще не занят, то
+                                    sendMessage(AUTH_SUCCESSFUL + " " + nick); //Пишем, что авторизация пройдена
+                                    this.nick = nick; //Приравниваем нашего Ника пиватному нику;
+                                    //Сервер делает рассылку что Ник зашел в чат
+                                    server.broadcast(this.nick + " зашел в чат");
+                                    //Отправляем клиенту привествие и системные ключи
+                                    server.sendWelcome(this.nick);
+
+
+                                    //Завершаем цикл авторизации
+                                    break;
+                                //Если занят, отправляем сособщение, что зщанят
+                                } else sendMessage( "Такой NickName уже авторизован - "+ nick);
+                            //Если такой логин и пароль отсутвуют
+                            } else sendMessage("Неверное имя пользователя и пароль");
+                            //Что то совсем пошло не так
+                        }   else sendMessage("Что-то пошло не так");
+                    }
+
+                    //Создаем новый поток для приема входящих сообщений
+                    while (true){
+                        //Сервер принял входящее сообщение
+                        String msg = in.readUTF();
+                        System.out.println("Клиент отправил сообщение: " + msg);
+
+
+                        //Прописываем условие исключение из чата equalsIgnoreCase -  сравнение строк без учета регистра
+                        if (msg.equalsIgnoreCase(CLOSE_CONNECTION)) break;
+
+                        ///////////////////////////////////////////////////////////////////////////////////////////////
+                        //Отправляем ЛС
+
+                        //Проверяем, начинается ли сообщения с ключа личного сообения
+                        try {
+                            if  (msg.startsWith(PRIVATE_MESSAGE)) {
+
+                                //Производим поиск получателя по участникам
+                                String[]messageElements = new String[2];
+
+                                //Отсекаем ключ с ником и основное сообшение
+                                messageElements = msg.split(" ", 2);
+                                String toNick = messageElements[0]; //Получатель
+                                String pMsg = messageElements[1]; //Сообщение
+                                server.sendPrivateMessage(this.nick, pMsg, toNick);
+
+                                //Отправляем это сообщение всем спользуя метод Броадкаст, из класса Server
+                            } else  server.broadcast(this.nick + " " +  msg);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        ///////////////////////////////////////////////////////////////////////////////////////////////
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }finally {
+                    //отписываемся от рассылки сообщений всем через this. Используем лямбду. Нужно обратиться именно к
+                    //ClirntHandler (на уровень выше), а не к Thread
+                    sendMessage("Вы отключились!");
+                    server.unSubscribeMe(this);
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+        }).start();
+    }
+
+    //Создаем метод отправки сообщений
+    public void sendMessage(String msg){
+        try {
+            out.writeUTF(msg);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+
+}
+
