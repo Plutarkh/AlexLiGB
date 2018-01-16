@@ -1,0 +1,145 @@
+package Server;
+
+import Client.ClientConnection;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Vector;
+
+public class Server implements ServerConst, Server_API {
+
+    //Создаем коллекция для хранения клиентов
+    //Vector -  полностью синхронизированный ArrayList
+
+    private Vector<ClientHandler> clients;
+
+    //Создаем сылку на сервис авторизации и геттер на него
+    private AuthService authService;
+    public AuthService getAuthService() {
+        return authService;
+    }
+
+
+    //Создаем конструктор сервера
+    public Server(){
+
+        ServerSocket server = null;
+        Socket socket = null;
+        clients = new Vector<>();
+
+
+        // Создаем цикл для постоянного доступа сервера для новых клиентов
+        //Оборачиваем все в трайкетч
+
+        try {
+            server = new ServerSocket(PORT);
+
+            //Создаем сервис авторизации и запускаем его
+            authService = new BaseAuthService();
+            authService.start();
+
+            System.out.println("Сервер запущен, ожидаем подключения клиентов");
+
+            while (true){
+                socket = server.accept();
+
+                clients.add(new ClientHandler (this,socket));
+                System.out.println("Клиент подключен");
+
+                ///////////////////////////////////////////////////////////////////////////
+                //Запускаем таймер для входа в  систему
+
+                //long timeConnect = System.currentTimeMillis();
+                //while (true) {
+
+                //long timer = System.currentTimeMillis() - timeConnect;
+                //if (timer >= 20000) {
+                        //System.out.println("Время ожидания истекло");
+                        //socket.close();
+                        //break;
+                    //} else if () break;
+                //}
+                ///////////////////////////////////////////////////////////////////////////
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+
+        }
+    }
+
+    //Создаем метод для отправки ЛС
+    public void sendPrivateMessage(String name, String pMsg, String toNick){
+        //отправляем ЛС получателю
+        for (int j = 0; j < clients.size(); j++) {
+            if (toNick.contains(clients.get(j).getNick())) clients.get(j).sendMessage(timeFormat.format(timeNow()) + "From "+ name + ": " + pMsg);
+            }
+
+        //отправляем ЛС отправителю
+        for (int i = 0; i <clients.size() ; i++) {
+            if (name.contains(clients.get(i).getNick())) clients.get(i).sendMessage(timeFormat.format(timeNow()) + "For "+ toNick + ": " + pMsg);
+        }
+    }
+
+    //Создаем метод для отправки сообщений всем
+    public void broadcast(String msg){
+
+        //Проходимся по всем клиентам из списка и отправляем им сообщения
+
+        for (int i = 0; i <clients.size() ; i++) {
+            clients.get(i).sendMessage(timeFormat.format(timeNow()) + msg);
+        }
+    }
+
+    //Создаем метод отключения от чата
+    public void unSubscribeMe(ClientHandler c){
+    clients.remove(c);
+    broadcastUserLIst();
+    }
+
+    //Проверяем Ник на задвоение при авторизации
+    public boolean isNickBusy(String nick){
+        for(ClientHandler client: clients){
+            if (client.getNick().equals(nick)) return true;
+        }
+        return false;
+    }
+
+    //Метод рассылки сообщения о для КлиентЛиста
+    public void broadcastUserLIst(){
+        StringBuffer sb = new StringBuffer(USER_LIST);
+        for (ClientHandler client: clients){
+            sb.append(" " + client.getNick());
+        }
+        for (ClientHandler client : clients){
+            client.sendMessage(sb.toString());
+        }
+    }
+
+    //Создаем метод отправки приветсвия
+    public void sendWelcome(String name) {
+        for (int i = 0; i < clients.size(); i++) {
+            if (clients.get(i).getNick().equals(name))
+                clients.get(i).sendMessage( "\n" + "Приветствуем Вас в чате Let's Talk!" + "\n" + "\n" +
+                        "Для управления чатом используйте следующие ключи:" + "\n" +
+                        "/end - отключитья от чата" + "\n" +
+                        "@nick message - отправить личное сообщение" + "\n" + "\n" +
+                        "Приятного общения!" + "\n");
+
+        }
+    }
+
+    //Создаем локальные часы часы
+    public Date timeNow(){
+        Date timeNow = new Date();
+        return timeNow;
+    }
+    //Прописываем формат времени
+    SimpleDateFormat timeFormat = new SimpleDateFormat("[ k:mm ] ");
+
+
+    }
