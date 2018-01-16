@@ -1,0 +1,113 @@
+package Client;
+
+import Server.ServerConst;
+import Server.Server_API;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Arrays;
+
+public class ClientConnection implements ServerConst, Server_API {
+
+    //Создаем сокет для коннекта
+    Socket socket;
+
+    //Создаем ссылки на входящие и исходящие каналы
+    DataInputStream in;
+    DataOutputStream out;
+
+
+    //Создаем переменную, геттер и сеттер для скрытия панели авторизации
+    private boolean isAuthorized = false;
+
+    public boolean isAuthorized() {
+        return isAuthorized;
+    }
+    public void setAuthorized(boolean authorized) {
+        isAuthorized = authorized;
+    }
+
+
+    //Метод, передающий сообщение в текстовое поле
+    public void init(ChatWindow view) {
+
+        try {
+            //Создаем в констуркторе  сокет для коннекта и каналы связи
+            this.socket = new Socket(SERVER_URL, PORT);
+            this.in = new DataInputStream(socket.getInputStream());
+            this.out = new DataOutputStream(socket.getOutputStream());
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        //Скрываем панельку авторизации
+                        //Если во входящем сообщении приходит текст с ключем AUTH_SUCCESSFUL , что авторизация успешно пройдена
+                        while (true) {
+                            String msg = in.readUTF();
+                            if (msg.startsWith(AUTH_SUCCESSFUL)) {
+                                // Говорим нашей переменной переклчателю что она тру
+                                setAuthorized(true);
+                                view.switchWindows();
+                                break;
+                            }
+                            view.showMessage(msg);
+                        }
+
+                        while (true) {
+                            String msg = in.readUTF();
+
+                            //Обновляем список клиентов
+                            if (msg.startsWith(SYSTEM_SYMBOL)){
+                                if (msg.startsWith(USER_LIST)){
+                                    String[] users = msg.split(" ");
+                                    //Сортируем по порядку
+                                    Arrays.sort(users);
+                                    view.showUsersList(users);
+                                }
+
+                            } else
+                                view.showMessage(msg);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Метод отправки сообщения
+    public void sendMessage(String msg) {
+        //Забираем сообщение  (msg)  из Чатвиндоу из метода send Message и отправляем
+        try {
+            out.writeUTF(msg);
+            // Отчищаем буфер
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Определяем метод авторизации
+    public void auth(String login, String password) {
+        try {
+            out.writeUTF(AUTH + " " + login + " " + password);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void disconnect() {
+        try {
+            out.writeUTF(CLOSE_CONNECTION);
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
