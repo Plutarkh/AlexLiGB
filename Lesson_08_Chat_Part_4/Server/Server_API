@@ -1,0 +1,13 @@
+package Server;
+
+//Интерфейс серверных системных сообений
+public interface Server_API {
+
+    String CLOSE_CONNECTION = "/end";
+    String AUTH = "/auth";
+    String AUTH_SUCCESSFUL = "/authok";
+    String PRIVATE_MESSAGE = "@";
+    String USER_LIST = "/userlist";
+    String SYSTEM_SYMBOL = "/";
+
+}
