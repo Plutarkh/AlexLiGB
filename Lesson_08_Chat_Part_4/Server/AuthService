@@ -1,6 +1,5 @@
 package Server;
-//Сервис, стартующий службу авторизации,
-// Вроде не нужен
+//Сервис, стартующий службу авторизации
 public interface AuthService {
 
     void start();
